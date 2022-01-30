@@ -37,3 +37,15 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'FTA sonalikaroy - Azure CXP Internal(0f629d89-46bc-474b-941a-c7140441a426)'
+        appType: 'webAppContainer'
+        WebAppName: 'srtestpco2'
+        deployToSlotOrASE: true
+        ResourceGroupName: 'pcodemo'
+        SlotName: 'production'
+        DockerNamespace: 'srhelmacr'
+        DockerRepository: 'sonalikaroypipelinesjavascriptdocker'
