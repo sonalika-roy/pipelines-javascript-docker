@@ -20,33 +20,43 @@ variables:
   vmImageName: 'ubuntu-latest'
 
 stages:
+
 - stage: Build
   displayName: Build and push stage
   jobs:
   - job: Build
+  - deployment: Deploytest
+    environment: test
     displayName: Build
     pool:
       #vmImage: $(vmImageName)
       name: 'self-hosted-agent'
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+      steps:
+      - task: Docker@2
+        displayName: Build and push an image to container registry
+        inputs:
+          command: buildAndPush
+          repository: $(imageRepository)
+          dockerfile: $(dockerfilePath)
+          containerRegistry: $(dockerRegistryServiceConnection)
+          tags: |
+            $(tag)
 
-    - task: AzureRmWebAppDeployment@4
-      inputs:
-        ConnectionType: 'AzureRM'
-        azureSubscription: 'FTA sonalikaroy - Azure CXP Internal(0f629d89-46bc-474b-941a-c7140441a426)'
-        appType: 'webAppContainer'
-        WebAppName: 'srtestpco2'
-        deployToSlotOrASE: true
-        ResourceGroupName: 'pcodemo'
-        SlotName: 'production'
-        DockerNamespace: 'srhelmacr'
-        DockerRepository: 'sonalikaroypipelinesjavascriptdocker'
+  - deployment: Deploydev
+    environment: dev
+    displayName: Build
+    pool:
+      #vmImage: $(vmImageName)
+      name: 'self-hosted-agent'
+      steps:
+      - task: AzureRmWebAppDeployment@4
+        inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'FTA sonalikaroy - Azure CXP Internal(0f629d89-46bc-474b-941a-c7140441a426)'
+          appType: 'webAppContainer'
+          WebAppName: 'srtestpco2'
+          deployToSlotOrASE: true
+          ResourceGroupName: 'pcodemo'
+          SlotName: 'production'
+          DockerNamespace: 'srhelmacr'
+          DockerRepository: 'sonalikaroypipelinesjavascriptdocker'
